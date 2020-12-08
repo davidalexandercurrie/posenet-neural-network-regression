@@ -9,10 +9,14 @@ let state = 'collection';
 let nnResults;
 let loopBroken = false;
 
+let socket;
+
 function setup() {
   createCanvas(640, 480);
   video = createCapture(VIDEO);
   video.size(width, height);
+
+  socket = io.connect();
 
   poseNet = ml5.poseNet(video, modelReady);
   // This sets up an event that fills the global variable "predictions"
@@ -128,6 +132,7 @@ function gotResults(error, results) {
   }
   console.log(results);
   nnResults = results;
+  sendToServer();
   classify();
 }
 
@@ -205,3 +210,7 @@ function getInputs() {
   }
   return inputs;
 }
+
+const sendToServer = () => {
+  socket.emit('posenet', nnResults);
+};
